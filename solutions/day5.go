@@ -8,12 +8,6 @@ import (
 	"strings"
 )
 
-func day5Pt2() {
-	res := 0
-	
-	fmt.Println("part 2: ", res)
-}
-
 func isValidOrder(order []string, rule map[string]bool) bool {
 	for _, v := range order {
 		if rule[v] { return false }
