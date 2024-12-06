@@ -1,23 +1,16 @@
-package main
+package solutions
 
 import (
+	"aoc2024/utils"
 	"fmt"
 	"os"
 	"slices"
-	"strconv"
 	"strings"
 )
 
-func handleErr(e error) { if e != nil { panic(e) } }
-
-func sToI(s string) int {
-	v, _ := strconv.Atoi(s);
-	return v
-}
-
 func increasing(prev int, seq []string) int {
 	for _, c := range seq {
-		curr := sToI(c)
+		curr := utils.StrToI(c)
 		if curr <= prev || curr - prev > 3 {
 			return 0
 		}
@@ -28,7 +21,7 @@ func increasing(prev int, seq []string) int {
 
 func decreasing(prev int, seq []string) int {
 	for _, c := range seq {
-		curr := sToI(c)
+		curr := utils.StrToI(c)
 		if curr >= prev || prev - curr > 3 {
 			return 0
 		}
@@ -37,12 +30,12 @@ func decreasing(prev int, seq []string) int {
 	return 1
 }
 
-func pt1(list []string) {
+func day2Pt1(list []string) {
 	res := 0
 	for _, line := range list {
 		strSeq := strings.Fields(line)
-		start := sToI(strSeq[0])
-		prev := sToI(strSeq[1])
+		start := utils.StrToI(strSeq[0])
+		prev := utils.StrToI(strSeq[1])
 		if prev == start {
 			continue
 		}
@@ -57,7 +50,7 @@ func pt1(list []string) {
 	fmt.Println("part 1: ", res)
 }
 
-func pt2(list[]string) {
+func day2Pt2(list[]string) {
 	res := 0
 
 	for _, line := range list {
@@ -76,8 +69,8 @@ func pt2(list[]string) {
 }
 
 func processPt2(strSeq []string) bool {
-	start := sToI(strSeq[0])
-	prev := sToI(strSeq[1])
+	start := utils.StrToI(strSeq[0])
+	prev := utils.StrToI(strSeq[1])
 	if prev == start {
 		return false
 	}
@@ -90,10 +83,10 @@ func processPt2(strSeq []string) bool {
 	return false
 }
 
-func main() {
+func Day2() {
 	f, err := os.ReadFile("day2/input.txt")
-	handleErr(err)
+	utils.HandleErr(err)
 	list := strings.Split(strings.TrimSpace(string(f)), "\n")
-	pt1(list)
-	pt2(list)
+	day2Pt1(list)
+	day2Pt2(list)
 }

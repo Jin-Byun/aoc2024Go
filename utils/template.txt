@@ -1,0 +1,29 @@
+package solutions
+
+import (
+	"aoc2024/utils"
+	"fmt"
+	"os"
+	"strings"
+)
+
+func day#Pt1() {
+	res := 0
+
+	fmt.Println("part 1: ", res)
+}
+
+
+func day#Pt2() {
+	res := 0
+	
+	fmt.Println("part 2: ", res)
+}
+
+func Day#() {
+	f, err := os.ReadFile("inputs/input#.txt")
+	utils.HandleErr(err)
+	lines := strings.Fields(strings.TrimSpace(string(f)))
+	day#Pt1(lines)
+	day#Pt2(lines)
+}

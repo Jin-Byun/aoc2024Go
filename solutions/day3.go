@@ -1,21 +1,14 @@
-package main
+package solutions
 
 import (
+	"aoc2024/utils"
 	"fmt"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
-func handleErr(e error) { if e != nil { panic(e) } }
-
-func sToI(s string) int {
-	v, _ := strconv.Atoi(s);
-	return v
-}
-
-func pt1(data string) {
+func day3Pt1(data string) {
 	res := 0
 	addMul(&res, data)
 	fmt.Println("part 1: ", res)
@@ -26,11 +19,11 @@ func addMul(res *int, s string) {
 	pairs := re.FindAllStringSubmatch(s, -1)
 	for _, p := range pairs {
 		numbers := strings.Split(p[1], ",")
-		*res += sToI(numbers[0]) * sToI(numbers[1])
+		*res += utils.StrToI(numbers[0]) * utils.StrToI(numbers[1])
 	}
 }
 
-func pt2(data string) {
+func day3Pt2(data string) {
 	start := strings.Index(data, "don't()")
 	res := 0
 	addMul(&res, data[:start])
@@ -42,11 +35,11 @@ func pt2(data string) {
 	fmt.Println("part 2: ", res)
 }
 
-func main() {
+func Day3() {
 	f, err := os.ReadFile("day3/input.txt")
-	handleErr(err)
+	utils.HandleErr(err)
 	data := string(f)
 	data = strings.ReplaceAll(data, "\n", "")
-	pt1(data)
-	pt2(data)
+	day3Pt1(data)
+	day3Pt2(data)
 }

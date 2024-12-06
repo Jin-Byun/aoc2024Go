@@ -1,3 +1,3 @@
-module github.com/Jin-Byun/aoc2024Go
+module aoc2024
 
 go 1.22.0
