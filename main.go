@@ -15,7 +15,7 @@ func main() {
 	switch cmd[0] {
 		case 'S', 's':
 			utils.SetUp(reader)
-		case 'X', 'x':
+		case 'X', 'x', 13:
 			day := utils.GetDay(reader)
 			switch day {
 				case "2":
@@ -26,6 +26,8 @@ func main() {
 					solutions.Day4()
 				case "5":
 					solutions.Day5()
+				case "6":
+					solutions.Day6()
 		}
 	}
 }

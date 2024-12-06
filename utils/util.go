@@ -62,7 +62,7 @@ func getInputData(day string) {
 func SetUp(reader *bufio.Reader) {
 	day := GetDay(reader)
 
-	// getInputData(day)
+	getInputData(day)
 	templatePath := filepath.Join(".", "utils", "template.txt")
 	template, err := os.ReadFile(templatePath)
 	HandleErr(err)
@@ -72,3 +72,5 @@ func SetUp(reader *bufio.Reader) {
 	solutionPath := filepath.Join(".", "solutions", "day" + day + ".go")
 	os.WriteFile(solutionPath, template, 0666)
 }
+
+func IdxInValid(r, c, n int) bool { return r < 0 || c < 0 || r == n || c == n }
