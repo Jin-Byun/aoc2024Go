@@ -28,6 +28,10 @@ func main() {
 					solutions.Day5()
 				case "6":
 					solutions.Day6()
+				case "7":
+					solutions.Day7()
+				case "8":
+					solutions.Day8()
 		}
 	}
 }

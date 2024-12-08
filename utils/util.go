@@ -73,4 +73,4 @@ func SetUp(reader *bufio.Reader) {
 	os.WriteFile(solutionPath, template, 0666)
 }
 
-func IdxInValid(r, c, n int) bool { return r < 0 || c < 0 || r == n || c == n }
+func IdxInValid(r, c, n int) bool { return r < 0 || c < 0 || r >= n || c >= n }
