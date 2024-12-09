@@ -7,23 +7,20 @@ import (
 	"strings"
 )
 
-func day#Pt1() {
-	res := 0
-
+func day#Pt1(res int) {
 	fmt.Println("part 1: ", res)
 }
 
 
-func day#Pt2() {
-	res := 0
-	
+func day#Pt2(res int) {
 	fmt.Println("part 2: ", res)
 }
 
 func Day#() {
+	// f, err := os.ReadFile("test.txt")
 	f, err := os.ReadFile("inputs/input#.txt")
 	utils.HandleErr(err)
 	lines := strings.Fields(strings.TrimSpace(string(f)))
-	day#Pt1(lines)
-	day#Pt2(lines)
+	day#Pt1(len(lines))
+	day#Pt2(len(lines))
 }
