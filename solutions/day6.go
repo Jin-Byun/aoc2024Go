@@ -28,9 +28,6 @@ func startingPos(grid [][]byte) (int, int) {
 	return -1, -1
 }
 
-func getCoord(x, y int) string {
-	return fmt.Sprintf("%d,%d", x, y)
-}
 func getState(x, y, d int) string {
 	return fmt.Sprintf("%d,%d,%d", x, y, d)
 }
@@ -45,12 +42,12 @@ func travel(hash map[string]bool, grid [][]byte, x, y int) {
 	for !utils.IdxInValid(y, x, N6) {
 		switch grid[y][x] {
 		case '#':
-			x, y = x - dir1[d], y + dir1[d + 1]
+			x, y = x - utils.MoveCardinal[d], y + utils.MoveCardinal[d + 1]
 			d = (d + 1) % 4
-			x, y = x + dir1[d], y - dir1[d + 1]
+			x, y = x + utils.MoveCardinal[d], y - utils.MoveCardinal[d + 1]
 		default:
-			hash[getCoord(x, y)] = true
-			x, y = x + dir1[d], y - dir1[d + 1]
+			hash[utils.GetCoord(x, y)] = true
+			x, y = x + utils.MoveCardinal[d], y - utils.MoveCardinal[d + 1]
 		}
 	}
 }
@@ -59,10 +56,10 @@ func simulation(grid [][]byte, x, y int) int {
 	d := 0
 	visited := map[string]struct{}{getState(x, y, d): {}}
 	for {
-		x, y = x + dir1[d], y - dir1[d + 1]
+		x, y = x + utils.MoveCardinal[d], y - utils.MoveCardinal[d + 1]
 		if utils.IdxInValid(y, x, N6) { return 0 }
 		if grid[y][x] == '#' {
-			x, y = x - dir1[d], y + dir1[d + 1]
+			x, y = x - utils.MoveCardinal[d], y + utils.MoveCardinal[d + 1]
 			d = (d + 1) % 4
 		}
 		newState := getState(x, y, d)
@@ -103,14 +100,14 @@ func Day6() {
 	// 		target := (i+3) % 4
 	// 		dx, dy := getPos(c, i)
 	// 		for !utils.IdxInValid(dx, dy, N6) && grid[dy][dx] != '#' {
-	// 			if (hash[getCoord(dx, dy)] >> target) & 1 == 1 && order[getCoord(dx, dy)] > order[c] {
-	// 				dx, dy = dx + dir1[target], dy - dir1[target+1]
+	// 			if (hash[utils.GetCoord(dx, dy)] >> target) & 1 == 1 && order[utils.GetCoord(dx, dy)] > order[c] {
+	// 				dx, dy = dx + utils.MoveCardinal[target], dy - utils.MoveCardinal[target+1]
 	// 				if grid[dy][dx] != '#' {
-	// 					obs[getCoord(dx, dy)] = true
+	// 					obs[utils.GetCoord(dx, dy)] = true
 	// 				}
-	// 				dx, dy = dx - dir1[target], dy + dir1[target+1]
+	// 				dx, dy = dx - utils.MoveCardinal[target], dy + utils.MoveCardinal[target+1]
 	// 			}
-	// 			dx, dy = dx - dir1[i], dy + dir1[i+1]
+	// 			dx, dy = dx - utils.MoveCardinal[i], dy + utils.MoveCardinal[i+1]
 	// 		}
 	// 	}
 	// }

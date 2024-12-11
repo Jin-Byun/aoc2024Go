@@ -12,6 +12,9 @@ import (
 	"time"
 )
 
+var MoveCardinal [5]int = [5]int{0, 1, 0, -1, 0}
+var MoveDiagonal [5]int = [5]int{-1, 1, 1, -1, -1}
+
 func GetDay(reader *bufio.Reader) string {
 	fmt.Print("Enter day: ")
 	day, _ := reader.ReadString('\n')
@@ -66,11 +69,21 @@ func SetUp(reader *bufio.Reader) {
 	templatePath := filepath.Join(".", "utils", "template.txt")
 	template, err := os.ReadFile(templatePath)
 	HandleErr(err)
-	for i := range template {
-		if template[i] == '#' { template[i] = day[0] }
+	for i := 0; i < len(template); i++ {
+		if template[i] == '#' {
+			template[i] = day[0]
+			if len(day) > 1 {
+				i++
+				template[i] = day[1]
+			}
+		}
 	}
 	solutionPath := filepath.Join(".", "solutions", "day" + day + ".go")
 	os.WriteFile(solutionPath, template, 0666)
 }
 
 func IdxInValid(r, c, n int) bool { return r < 0 || c < 0 || r >= n || c >= n }
+
+func GetCoord(x, y int) string {
+	return fmt.Sprintf("%d,%d", x, y)
+}

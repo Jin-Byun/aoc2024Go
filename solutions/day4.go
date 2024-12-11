@@ -7,16 +7,13 @@ import (
 	"strings"
 )
 
-var dir1 [5]int = [5]int{0, 1, 0, -1, 0}
-var dir2 [5]int = [5]int{-1, 1, 1, -1, -1}
-
 var mas [3]byte = [3]byte{'M', 'A', 'S'};
 
 var N4 int = 140
 
 func checkDirection1(r, c, i int, puzzle []string) int {
 	for j := range 3 {
-		r, c = r+dir1[i], c+dir1[i+1]
+		r, c = r+utils.MoveCardinal[i], c+utils.MoveCardinal[i+1]
 		if utils.IdxInValid(r, c, N4) { return 0 }
 		if puzzle[r][c] != mas[j] { return 0 }
 	}
@@ -24,7 +21,7 @@ func checkDirection1(r, c, i int, puzzle []string) int {
 }
 func checkDirection2(r, c, i int, puzzle []string) int {
 	for j := range 3 {
-		r, c = r+dir2[i], c+dir2[i+1]
+		r, c = r+utils.MoveDiagonal[i], c+utils.MoveDiagonal[i+1]
 		if utils.IdxInValid(r, c, N4) { return 0 }
 		if puzzle[r][c] != mas[j] { return 0 }
 	}

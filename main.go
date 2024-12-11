@@ -34,6 +34,8 @@ func main() {
 					solutions.Day8()
 				case "9":
 					solutions.Day9()
+				case "10":
+					solutions.Day10()
 		}
 	}
 }
