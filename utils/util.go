@@ -87,3 +87,10 @@ func IdxInValid(r, c, n int) bool { return r < 0 || c < 0 || r >= n || c >= n }
 func GetCoord(x, y int) string {
 	return fmt.Sprintf("%d,%d", x, y)
 }
+
+func FuncTimer(name string) func() {
+	start := time.Now()
+	return func() {
+		fmt.Printf("%s took %v\n", name, time.Since(start))
+	}
+}
