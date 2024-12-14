@@ -8,12 +8,11 @@ import (
 )
 
 func day##Pt1(res int) {
-	fmt.Println("part 1: ", res)
+	fmt.Println("part 1:", res)
 }
 
-
 func day##Pt2(res int) {
-	fmt.Println("part 2: ", res)
+	fmt.Println("part 2:", res)
 }
 
 func Day##() {
