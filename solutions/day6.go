@@ -17,10 +17,10 @@ func day6Pt2(res int) {
 	fmt.Println("part 2: ", res)
 }
 
-func startingPos(grid [][]byte) (int, int) {
-	for r := range N6 {
-		for c := range N6 {
-			if grid[r][c] == '^' { 
+func startingPos(grid [][]byte, target byte) (int, int) {
+	for r := range grid {
+		for c := range grid[r] {
+			if grid[r][c] == target { 
 				return c, r
 			}
 		}
@@ -87,7 +87,7 @@ func Day6() {
 	for i := range N6 {
 		grid[i] = []byte(lines[i])
 	}
-	x, y := startingPos(grid)
+	x, y := startingPos(grid, '^')
 	hash := map[string]bool{}
 	travel(hash, grid, x, y)
 	res := 0

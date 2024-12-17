@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-var MoveCardinal [5]int = [5]int{0, 1, 0, -1, 0}
+var MoveCardinal [5]int = [5]int{0, 1, 0, -1, 0} // right, down, left, up if y+i x+i+1
 var MoveDiagonal [5]int = [5]int{-1, 1, 1, -1, -1}
 
 func GetDay(reader *bufio.Reader) string {
@@ -83,6 +83,7 @@ func SetUp(reader *bufio.Reader) {
 }
 
 func IdxInValid(r, c, n int) bool { return r < 0 || c < 0 || r >= n || c >= n }
+func IdxInValid2(r, c, nr, nc int) bool { return r < 0 || c < 0 || r >= nr || c >= nc }
 
 func GetCoord(x, y int) string {
 	return fmt.Sprintf("%d,%d", x, y)

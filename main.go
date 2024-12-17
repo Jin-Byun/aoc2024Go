@@ -44,6 +44,12 @@ func main() {
 					solutions.Day13()
 				case "14":
 					solutions.Day14()
+				case "15":
+					solutions.Day15()
+				case "16":
+					// solutions.Day16()
+				case "17":
+					// solutions.Day17()
 		}
 	}
 }
