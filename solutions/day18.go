@@ -62,32 +62,36 @@ func Day18() {
 		x := utils.StrToI(pos[0])
 		y := utils.StrToI(pos[1])
 		grid[y][x] = '#'
-		q := &PathHeap{Path{start, 0}}
-		heap.Init(q)
-		cost := map[[2]int]int{start: 0}
-		for q.Len() > 0 {
-			curr := heap.Pop(q).(Path)
-			x, y := curr.Pos[0], curr.Pos[1]
-			if curr.Pos == goal {
-				break
-			}
-			for d := range 4 {
-				dy, dx := y + utils.MoveCardinal[d], x + utils.MoveCardinal[d+1]
-				if utils.IdxInValid(dx, dy, n) || grid[dy][dx] == '#' { continue }
-				score := cost[curr.Pos] + 1
-				next := [2]int{dx, dy}
-				if v, exists := cost[next]; !exists || score < v {
-					cost[next] = score
-					heap.Push(q, Path{next, score + heuristic(goal, next)})
-				}
-			}
-		}
-		if _, ok := cost[goal]; !ok {
+		if aStarPath(start, goal, grid, n) < 0 {
 			fmt.Println(x, y)
-			break
+			return
 		}
 	}
 	// fmt.Println(cost)
 	// day18Pt1(cost[goal])
 	// day18Pt2(len(lines))
+}
+
+func aStarPath[V string | []byte](start, goal [2]int, grid []V, n int) int {
+	q := &PathHeap{Path{start, 0}}
+	heap.Init(q)
+	cost := map[[2]int]int{start: 0}
+	for q.Len() > 0 {
+		curr := heap.Pop(q).(Path)
+		if curr.Pos == goal {
+			return cost[goal]
+		}
+		x, y := curr.Pos[0], curr.Pos[1]
+		for d := range 4 {
+			dy, dx := y + utils.MoveCardinal[d], x + utils.MoveCardinal[d+1]
+			if utils.IdxInValid(dx, dy, n) || grid[dy][dx] == '#' { continue }
+			score := cost[curr.Pos] + 1
+			next := [2]int{dx, dy}
+			if v, exists := cost[next]; !exists || score < v {
+				cost[next] = score
+				heap.Push(q, Path{next, score + heuristic(goal, next)})
+			}
+		}
+	}
+	return -1
 }
