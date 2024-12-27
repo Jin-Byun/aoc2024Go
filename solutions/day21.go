@@ -3,6 +3,7 @@ package solutions
 import (
 	"aoc2024/utils"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -18,142 +19,222 @@ import (
 //     | 0 | A | <--- start here
 //     +---+---+
 
-// Find shortest key press you make and multiply by numeric value
-const numA = 10
-const dA = 4
-var zero rune = '0'
-var Numpad [11][2]int8 = [11][2]int8{
-	{1,3}, {0,2}, {1,2}, {2,2}, {0,1}, {1,1}, {2,1}, {0,0}, {1,0}, {2,0}, {2,3},
-}
-var Dpad [5][2]int8 = [5][2]int8{{2,1},{1,1},{0,1},{1,0},{2,0}}
+var numpad []string = []string{"789", "456", "123", " 0A"}
+var dpad []string = []string{" ^A", "<v>"}
 
-var NumGap [2]int8 = [2]int8{0, 3}
-var DGap [2]int8 = [2]int8{2, 0}
-
-func updateY(matrix *[]byte, dy int8) {
-	for y := dy; y > 0; y-- { // going down
-		*matrix = append(*matrix, 'v')
-	}
-	for y := dy; y < 0; y++ { // going down
-		*matrix = append(*matrix, '^')
-	}
+type CodePhase struct {
+	code string
+	phase int
 }
 
-func updateX(matrix *[]byte, dx int8) {
-	for x := dx; x > 0; x-- { // going down
-		*matrix = append(*matrix, '>')
+var numCache map[[4]int][]string
+func getNumPaths(prev, curr [2]int) []string {
+	if v, exists := numCache[[4]int{prev[0], prev[1], curr[0], curr[1]}]; exists {
+		return v
 	}
-	for x := dx; x < 0; x++ { // going down
-		*matrix = append(*matrix, '<')
+	paths := toPaths(numpad, prev, curr)
+	dirs := []string{}
+	for _, path := range paths {
+		dirs = append(dirs, toDirection(path))
 	}
+	numCache[[4]int{prev[0], prev[1], curr[0], curr[1]}] = dirs
+	return dirs
 }
 
-func numpadMatrix() [11][11][]byte {
-	adjMatrix := [11][11][]byte{}
-	for i := range 11 {
-		adjMatrix[i][i] = []byte{'A'}
-		x1, y1 := Numpad[i][0], Numpad[i][1]
-		for j := range 11 {
-			if j == i || adjMatrix[i][j] != nil { continue }
-			adjMatrix[i][j] = make([]byte, 0)
-			adjMatrix[j][i] = make([]byte, 0)
-			x2, y2 := Numpad[j][0], Numpad[j][1]
-			dx, dy := x2-x1, y2-y1
-			if dx < 0 {
-				updateY(&adjMatrix[i][j], dy)
-				updateX(&adjMatrix[i][j], dx)
-				updateX(&adjMatrix[j][i], -dx)
-				updateY(&adjMatrix[j][i], -dy)
+var dCache map[[4]int][]string
+func getDPaths(prev, curr [2]int) []string {
+	if v, exists := dCache[[4]int{prev[0], prev[1], curr[0], curr[1]}]; exists {
+		return v
+	}
+	paths := toPaths(dpad, prev, curr)
+	dirs := []string{}
+	for _, path := range paths {
+		dirs = append(dirs, toDirection(path))
+	}
+	numCache[[4]int{prev[0], prev[1], curr[0], curr[1]}] = dirs
+	return dirs
+}
+
+func toDirection(p [][2]int) string {
+	var sb strings.Builder
+	for i := 1; i < len(p); i++ {
+		r1, c1 := p[i-1][0], p[i-1][1]
+		r2, c2 := p[i][0], p[i][1]
+		if r1 == r2 {
+			if c2 > c1 {
+				sb.WriteByte('>')
 			} else {
-				updateX(&adjMatrix[i][j], dx)
-				updateY(&adjMatrix[i][j], dy)
-				updateY(&adjMatrix[j][i], -dy)
-				updateX(&adjMatrix[j][i], -dx)
+				sb.WriteByte('<')
 			}
-			adjMatrix[i][j] = append(adjMatrix[i][j], 'A')
-			adjMatrix[j][i] = append(adjMatrix[j][i], 'A')
+		} else {
+			if r2 > r1 {
+				sb.WriteByte('v')
+			} else {
+				sb.WriteByte('^')
+			}
 		}
 	}
-	return adjMatrix
+	sb.WriteByte('A')
+	return sb.String()
 }
 
-func dpadMatrix() [5][5][]byte {
-	adjMatrix := [5][5][]byte{}
-	for i := range 5 {
-		adjMatrix[i][i] = []byte{'A'}
-		x1, y1 := Dpad[i][0], Dpad[i][1]
-		for j := range 5 {
-			if j == i || adjMatrix[i][j] != nil { continue }
-			adjMatrix[i][j] = make([]byte, 0)
-			adjMatrix[j][i] = make([]byte, 0)
-			x2, y2 := Dpad[j][0], Dpad[j][1]
-			dx, dy := x2-x1, y2-y1
-			if dx < 0 {
-				updateY(&adjMatrix[i][j], dy)
-				updateX(&adjMatrix[i][j], dx)
-				updateX(&adjMatrix[j][i], -dx)
-				updateY(&adjMatrix[j][i], -dy)
-			} else {
-				updateX(&adjMatrix[i][j], dx)
-				updateY(&adjMatrix[i][j], dy)
-				updateY(&adjMatrix[j][i], -dy)
-				updateX(&adjMatrix[j][i], -dx)
-			}
-			adjMatrix[i][j] = append(adjMatrix[i][j], 'A')
-			adjMatrix[j][i] = append(adjMatrix[j][i], 'A')
+func toPaths(grid []string, start, end [2]int) [][][2]int {
+	h, w := len(grid), len(grid[0])
+	dist := make([][]int, h)
+	pred := make([][][][2]int, h)
+	for r := range h {
+		dist[r] = make([]int, w)
+		pred[r] = make([][][2]int, w)
+		for c := range w {
+			dist[r][c] = math.MaxInt32
 		}
 	}
-	return adjMatrix
+	q := [][2]int{start}
+	dist[start[0]][start[1]] = 0
+	for len(q) > 0 {
+		curr := q[0]
+		q = q[1:]
+		r, c := curr[0], curr[1]
+		d := dist[r][c]
+		for direction := range 4 {
+			nr, nc := r + utils.MoveCardinal[direction], c + utils.MoveCardinal[direction+1]
+			if utils.IdxInValid2(nr, nc, h, w) || grid[nr][nc] == ' ' { continue }
+			nd := d+1
+			if nd < dist[nr][nc] {
+				dist[nr][nc] = nd
+				pred[nr][nc] = [][2]int{curr}
+				q = append(q, [2]int{nr, nc})
+			} else if nd == dist[nr][nc] {
+				pred[nr][nc] = append(pred[nr][nc], curr)
+			}
+		}
+	}
+	if dist[end[0]][end[1]] == math.MaxInt32 { return [][][2]int{} }
+	var buildPath func(pos [2]int) [][][2]int
+	buildPath = func(pos [2]int) [][][2]int {
+		if pos == start { return [][][2]int{{start}} }
+		path := [][][2]int{}
+		for _, prePos := range pred[pos[0]][pos[1]] {
+			for _, p := range buildPath(prePos) {
+				path = append(path, append(p, pos))
+			}
+		}
+		return path
+	}
+	return buildPath(end)
 }
 
 func day21Pt1(lines []string) {
-	nums := make([]int, len(lines))
-	start := numA
-	nMat := numpadMatrix()
-	var sb strings.Builder
-	// fmt.Println(lines[4])
-	for i, l := range lines {
-		v, _ := strconv.Atoi(l[:len(l)-1])
-		nums[i] = v
-		sb.Reset()
-		for _, r := range l {
-			dest := min(int(r-zero), numA)
-			sb.Write(nMat[start][dest])
-			start = dest
+	numPos := map[rune][2]int{}
+	for r := range numpad {
+		for c, b := range numpad[r] {
+			numPos[b] = [2]int{r, c}
 		}
-		lines[i] = sb.String()
 	}
-	start = dA
-	dMat := dpadMatrix()
-	for range 2 {
-		for i, l := range lines {
-			sb.Reset()
-			for _, r := range l {
-				var dest int
-				switch r {
-					case '>': dest = 0
-					case 'v': dest = 1
-					case '<': dest = 2
-					case '^': dest = 3
-					case 'A': dest = 4
-					}				
-					sb.Write(dMat[start][dest])
-					start = dest
-				}
-				lines[i] = sb.String()
+	dPos := map[rune][2]int{}
+	for r := range dpad {
+		for c, b := range dpad[r] {
+			dPos[b] = [2]int{r, c}
+		}
+	}
+
+	seqCache := map[CodePhase]int{}
+	lastChar := [3]rune{'A', 'A', 'A'}
+	var seq func(string, int) int
+	seq = func(s string, phase int) int {
+		if v, exists := seqCache[CodePhase{s, phase}]; exists {
+			return v
+		}
+		totalLength := 0
+		for _, c := range s {
+			var prev, curr [2]int
+			var paths []string
+			if phase == 0 {
+				prev, curr = numPos[lastChar[phase]], numPos[c]
+				paths = getNumPaths(prev, curr)
+			} else {
+				prev, curr = dPos[lastChar[phase]], dPos[c]
+				paths = getDPaths(prev, curr)
 			}
+			lastChar[phase] = c
+			minP := math.MaxInt32
+			for _, p := range paths {
+				tmp := len(p)
+				if phase < 2 {
+					tmp = seq(p, phase+1)
+				}
+				minP = min(minP, tmp)
+			}
+			totalLength += minP
 		}
-	res := 0
-	fmt.Println(lines[4])
-	for i := range lines {
-		// fmt.Println(len(lines[i]), nums[i])
-		res += len(lines[i]) * nums[i]
+		seqCache[CodePhase{s, phase}] = totalLength
+		return totalLength
 	}
-	fmt.Println("part 1:", res)
+	total := 0
+	for i, l := range lines {
+		numeric, _ := strconv.Atoi(l[:3])
+		fmt.Println(i, l, numeric)
+		total += numeric * seq(l, 0)
+	}
+	fmt.Println("part 1:", total)
 }
 
-func day21Pt2(res int) {
-	fmt.Println("part 2:", res)
+func day21Pt2(lines []string) {
+	numPos := map[rune][2]int{}
+	for r := range numpad {
+		for c, b := range numpad[r] {
+			numPos[b] = [2]int{r, c}
+		}
+	}
+	dPos := map[rune][2]int{}
+	for r := range dpad {
+		for c, b := range dpad[r] {
+			dPos[b] = [2]int{r, c}
+		}
+	}
+
+	seqCache := map[CodePhase]int{}
+	lastChar := [26]rune{}
+	for i := range lastChar {
+		lastChar[i] = 'A'
+	}
+	var seq func(string, int) int
+	seq = func(s string, phase int) int {
+		if v, exists := seqCache[CodePhase{s, phase}]; exists {
+			return v
+		}
+		totalLength := 0
+		for _, c := range s {
+			var prev, curr [2]int
+			var paths []string
+			if phase == 0 {
+				prev, curr = numPos[lastChar[phase]], numPos[c]
+				paths = getNumPaths(prev, curr)
+			} else {
+				prev, curr = dPos[lastChar[phase]], dPos[c]
+				paths = getDPaths(prev, curr)
+			}
+			lastChar[phase] = c
+			minP := math.MaxInt64
+			for _, p := range paths {
+				tmp := len(p)
+				if phase < 25 {
+					tmp = seq(p, phase+1)
+				}
+				minP = min(minP, tmp)
+			}
+			totalLength += minP
+		}
+		seqCache[CodePhase{s, phase}] = totalLength
+		return totalLength
+	}
+	total := 0
+	for i, l := range lines {
+		numeric, _ := strconv.Atoi(l[:3])
+		fmt.Println(i, l, numeric)
+		total += numeric * seq(l, 0)
+	}
+	fmt.Println("part 2:", total)
 }
 
 func Day21() {
@@ -161,6 +242,8 @@ func Day21() {
 	f, err := os.ReadFile("inputs/input21.txt")
 	utils.HandleErr(err)
 	lines := strings.Fields(strings.TrimSpace(string(f)))
+	numCache = map[[4]int][]string{}
+	dCache = map[[4]int][]string{}
 	day21Pt1(lines)
-	day21Pt2(len(lines))
+	day21Pt2(lines)
 }
